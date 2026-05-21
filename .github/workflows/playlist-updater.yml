@@ -1,0 +1,33 @@
+name: Playlist Auto Updater
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-playlist:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Download Playlist
+        run: |
+          curl -L "https://playlist.lampasioagus.workers.dev/" -o njing/playlist.m3u
+
+      - name: Commit changes
+        run: |
+          git config --global user.name "iwanfalstv"
+          git config --global user.email "iwansandra1974@gmail.com"
+
+          git add njing/playlist.m3u
+
+          git diff --cached --quiet || git commit -m "Auto update playlist"
+
+      - name: Push changes
+        run: git push
